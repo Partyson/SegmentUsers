@@ -1,0 +1,57 @@
+﻿version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: note_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.Migrations 
+    container_name: note_service_migrator
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=${DB_HOST};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Port=${DB_PORT}"
+      ASPNETCORE_ENVIRONMENT: Development 
+
+
+  api:
+    build:
+      context: .
+      dockerfile: NoteApp.API/Dockerfile
+    container_name: note_service_api
+    depends_on:
+      migrator:
+        condition: service_completed_successfully 
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=${DB_HOST};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Port=${DB_PORT}"
+    ports:
+      - "5003:8080"
+
+  ui:
+    build:
+      context: .
+      dockerfile: NoteApp.UI/Dockerfile
+    container_name: note_service_ui
+    depends_on:
+      - api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5002:8080"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,23 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AExceptionDispatchInfo_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F45ada8c418664ff394ffd30455aab498c90910_003F4d_003Fe7a64699_003FExceptionDispatchInfo_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AMethodBase_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fa6b7f037ba7b44df80b8d3aa7e58eeb2e8e938_003Ffa_003Fd929fdc5_003FMethodBase_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AMonitor_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F45ada8c418664ff394ffd30455aab498c90910_003F5c_003Ff10224ce_003FMonitor_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003APageModel_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F2f570afbe0db4a068a9eace8f862bb8e6e910_003F05_003F3bdd5d25_003FPageModel_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ARuntimeMethodHandle_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fa6b7f037ba7b44df80b8d3aa7e58eeb2e8e938_003F8a_003F3f765fb6_003FRuntimeMethodHandle_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AType_002Ecs_002Fl_003AC_0021_003FUsers_003Fbogda_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fa6b7f037ba7b44df80b8d3aa7e58eeb2e8e938_003F4f_003F3ded0e94_003FType_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6df29c28_002D968e_002D476c_002Da6b5_002Da8da2d76a982/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetAllFoldersByUserId_Should_Return_Only_User_Folders" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;ProjectFolder&gt;8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC/d:RepositoryTests&lt;/ProjectFolder&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;xUnit::8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC::net9.0::NoteApp.Tests.ServiceTest.FolderServiceTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC::net9.0::NoteApp.Tests.ServiceTest.NoteServiceTests&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=89c5a509_002De5db_002D491e_002Dab67_002De8fab0537812/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="FolderRepositoryTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC::net9.0::NoteApp.Tests.RepositoryTests.FolderRepositoryTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC::net9.0::NoteApp.Tests.RepositoryTests.NotesRepositoryTests.CreateNote_Should_Add_Note&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::8E0F3A3B-3AF3-4D58-86C6-74F3C93F6EFC::net9.0::NoteApp.Tests.RepositoryTests.NotesRepositoryTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

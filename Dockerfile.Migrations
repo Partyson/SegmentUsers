@@ -1,0 +1,23 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-migrations
+
+WORKDIR /src
+
+COPY ["NoteApp.API/NoteApp.API.csproj", "NoteApp.API/"]
+COPY ["NoteApp.Application/NoteApp.Application.csproj", "NoteApp.Application/"]
+COPY ["NoteApp.Infrastructure/NoteApp.Infrastructure.csproj", "NoteApp.Infrastructure/"]
+COPY ["NoteApp.Domain/NoteApp.Domain.csproj", "NoteApp.Domain/"]
+
+RUN dotnet restore "NoteApp.API/NoteApp.API.csproj"
+
+COPY . .
+
+WORKDIR "/src/NoteApp.API"
+
+FROM build-migrations AS migration-runner
+
+WORKDIR /src/NoteApp.API
+
+RUN dotnet tool install --global dotnet-ef --version 9.0.*
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+RUN dotnet ef database update --project ../NoteApp.Infrastructure/NoteApp.Infrastructure.csproj --startup-project NoteApp.API.csproj --verbose

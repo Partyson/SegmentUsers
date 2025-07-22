@@ -1,0 +1,10 @@
+.idea/
+
+NoteApp.API/bin/
+NoteApp.Domain/bin/
+NoteApp.Infrastructure/bin/
+NoteApp.Application/bin/
+obj/
+
+NoteApp.API/.env
+.env

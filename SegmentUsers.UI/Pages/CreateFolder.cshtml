@@ -1,0 +1,34 @@
+﻿@page
+@model SegmentUsers.UI.Pages.CreateFolderModel
+@{
+ViewData["Title"] = "Создать папку";
+}
+
+<h2>Создать папку</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="FolderName" class="form-label">Имя папки</label>
+        <input asp-for="FolderName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Image" class="form-label">Изображение</label>
+        <input asp-for="Image" type="file" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-outline-primary">Создать</button>
+        <a asp-page="/Index" class="btn btn-outline-secondary">Отмена</a>
+    </div>
+</form>
+
+@if (Model.Errors?.Any() == true)
+{
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            @foreach (var error in Model.Errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}

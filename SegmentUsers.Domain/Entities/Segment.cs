@@ -1,0 +1,9 @@
+﻿namespace SegmentUsers.Domain.Entities;
+
+public class Segment
+{
+    public Guid Id { get; set; }
+    public required string Name { get; set; }
+    public required string Discription { get; set; }
+    public List<User> Users { get; set; }
+}

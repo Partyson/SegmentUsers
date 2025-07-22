@@ -1,0 +1,48 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SegmentUsers.UI.Extensions
+@model SegmentUsers.UI.Pages.IndexModel
+@{
+ViewData["Title"] = "Главная";
+}
+
+<h1>Папки</h1>
+@if (Model.Folders.Any())
+{
+<ul style="list-style: none; padding: 0;">
+    @foreach (var folder in Model.Folders)
+    {
+        <li class="list-group-item d-flex align-items-start">
+                <div style="width: 50px; height: 50px; overflow: hidden; border-radius: 8px; margin-right: 10px;">
+                    <img src="@folder.ImagePath" alt="Folder Image"
+                         style="width: 100%; height: 100%; object-fit: cover; object-position: center;" />
+                </div>
+                <div class="fw-bold" style="margin: 10px;">
+                    <a asp-page="/Folder" asp-route-folderId="@folder.Id"
+                       style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                        <span style="font-size: 1.2em;">@folder.Name</span>
+                    </a>
+                </div>
+        </li>
+        
+    }
+</ul>
+}
+else
+{
+<p>Папок пока нет.</p>
+}
+
+<h1>Заметки без папки</h1>
+@{
+ViewData["FolderName"] = "";
+ViewData["EmptyMessage"] = "Заметок не найдено.";
+}
+
+<partial name="_NotesList" model="Model.Notes" />
+
+<div style="margin-top:20px;">
+    <a asp-page="/Notes" class="btn btn-outline-primary">Все заметки</a>
+    <a asp-page="/CreateFolder" class="btn btn-outline-secondary">Создать папку</a>
+    <a asp-page="/CreateNote" class="btn btn-outline-info">Создать заметку</a>
+</div>
