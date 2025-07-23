@@ -5,11 +5,11 @@ using SegmentUsers.Infrastructure.Data;
 
 namespace SegmentUsers.Application.Services;
 
-public class UserService(AppDbContext context) : IUserService
+public class VkUserService(AppDbContext context) : IVkUserService
 {
     public async Task<bool> AddToSegments(Guid userId, List<Guid> segmentIds)
     {
-        var user = await context.Users
+        var user = await context.VkUsers
             .Include(u => u.Segments)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -25,50 +25,53 @@ public class UserService(AppDbContext context) : IUserService
         return true;
     }
 
-    public async Task<List<SegmentResponseDto>> GetUserSegments(Guid userId)
+    public async Task<UserResponseDto?> GetVkUser(Guid userId)
     {
-        var user = await context.Users
+        var user = await context.VkUsers
             .Include(u => u.Segments)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null) 
-            return [];
+            return null;
 
-        return user.Segments.Select(s => new SegmentResponseDto
+        return new UserResponseDto
         {
-            Id = s.Id,
-            Name = s.Name,
-            Description = s.Discription,
-            UserIds = [user.Id]
-        }).ToList();
+            Id = user.Id,
+            Email = user.Email,
+            LastName = user.LastName,
+            Name = user.Name,
+            Segments = user.Segments.Select(s => new SegmentResponseDto
+            {
+                Id = s.Id,
+                Description = s.Description,
+                Name = s.Name
+            }).ToList(),
+        };
     }
 
-    public async Task<List<SegmentResponseDto>> GetAllUserSegments()
+    public async Task<List<UserResponseDto>> GetVkUsers()
     {
-        var users = await context.Users
-            .Include(u => u.Segments)
-            .ToListAsync();
-
-        var result = new List<SegmentResponseDto>();
-
-        foreach (var user in users)
-        {
-            result.AddRange(user.Segments
-                .Select(segment => new SegmentResponseDto
+        var users = await context.VkUsers
+            .Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                LastName = u.LastName,
+                Name = u.Name,
+                Segments = u.Segments.Select(s => new SegmentResponseDto
                 {
-                    Id = segment.Id,
-                    Name = segment.Name,
-                    Description = segment.Discription,
-                    UserIds = [user.Id]
-                }));
-        }
-
-        return result;
+                    Id = s.Id,
+                    Description = s.Description,
+                    Name = s.Name
+                }).ToList()
+            })
+            .ToListAsync();
+        return users;
     }
 
     public async Task<bool> DeleteFromSegments(Guid userId, List<Guid> segmentIds)
     {
-        var user = await context.Users
+        var user = await context.VkUsers
             .Include(u => u.Segments)
             .FirstOrDefaultAsync(u => u.Id == userId);
 

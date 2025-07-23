@@ -10,19 +10,19 @@ public class SegmentService(AppDbContext context) : ISegmentService
 {
     public async Task<Guid> CreateSegment(CreateSegmentDto createSegmentDto)
     {
-        var users = context.Users
-            .Where(x => createSegmentDto.UserIds.Contains(x.Id))
+        var users = context.VkUsers
+            .Where(x => createSegmentDto.VkUserIds.Contains(x.Id))
             .ToList();
-        
-        if (users.Count != createSegmentDto.UserIds.Count)
+
+        if (users.Count != createSegmentDto.VkUserIds.Count)
             return Guid.Empty;
         
         var segment = new Segment
         {
             Id = Guid.NewGuid(),
             Name = createSegmentDto.Name,
-            Discription = createSegmentDto.Description,
-            Users = users
+            Description = createSegmentDto.Description,
+            VkUsers = users
         };
         
         var segmentEntityEntry = await context.Segments.AddAsync(segment);
@@ -30,20 +30,21 @@ public class SegmentService(AppDbContext context) : ISegmentService
         return segmentEntityEntry.Entity.Id;
     }
 
-    public async Task<bool> AddSegmentForAnyPercentRandomUsers(Guid segmentId, int percent)
+    public async Task<bool> AddSegmentForAnyPercentRandomVkUsers(Guid segmentId, int percent)
     {
+        //TODO перенести в валидацию
         if (percent is < 0 or > 100)
             return false;
 
         var segment = await context.Segments
-            .Include(s => s.Users)
+            .Include(s => s.VkUsers)
             .FirstOrDefaultAsync(s => s.Id == segmentId);
 
         if (segment == null)
             return false;
 
-        var usersNotInSegment = await context.Users
-            .Where(u => segment.Users.All(su => su.Id != u.Id))
+        var usersNotInSegment = await context.VkUsers
+            .Where(u => segment.VkUsers.All(su => su.Id != u.Id))
             .ToListAsync();
 
         if (usersNotInSegment.Count == 0)
@@ -52,7 +53,7 @@ public class SegmentService(AppDbContext context) : ISegmentService
         var usersToAddCount = (int)Math.Floor(usersNotInSegment.Count * (percent / 100.0));
 
         if (usersToAddCount == 0)
-            return true; 
+            return true;
         
         var random = new Random();
         var selectedUsers = usersNotInSegment
@@ -60,7 +61,7 @@ public class SegmentService(AppDbContext context) : ISegmentService
             .Take(usersToAddCount)
             .ToList();
         
-        segment.Users.AddRange(selectedUsers);
+        segment.VkUsers.AddRange(selectedUsers);
         await context.SaveChangesAsync();
         return true;
     }
@@ -68,35 +69,35 @@ public class SegmentService(AppDbContext context) : ISegmentService
     public async Task<bool> AddSomeUsersForSegment(Guid segmentId, List<Guid> userIds)
     {
         var segment = await context.Segments
-            .Include(s => s.Users)
+            .Include(s => s.VkUsers)
             .FirstOrDefaultAsync(s => s.Id == segmentId);
 
         if (segment == null) 
             return false;
 
-        var users = await context.Users
-            .Where(u => userIds.Contains(u.Id) && segment.Users.All(user => user.Id != u.Id))
+        var users = await context.VkUsers
+            .Where(u => userIds.Contains(u.Id) && segment.VkUsers.All(user => user.Id != u.Id))
             .ToListAsync();
         
-        segment.Users.AddRange(users);
+        segment.VkUsers.AddRange(users);
         await context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<SegmentResponseDto> GetSegment(Guid segmentId)
+    public async Task<SegmentResponseDto?> GetSegment(Guid segmentId)
     {
         var segment = await context.Segments
-            .Include(s => s.Users)
+            .Include(s => s.VkUsers)
             .FirstOrDefaultAsync(s => s.Id == segmentId);
 
-        if (segment == null) return null;
+        if (segment == null) 
+            return null;
 
         return new SegmentResponseDto
         {
             Id = segment.Id,
             Name = segment.Name,
-            Description = segment.Discription,
-            UserIds = segment.Users.Select(u => u.Id).ToList()
+            Description = segment.Description,
         };
     }
 
@@ -108,8 +109,7 @@ public class SegmentService(AppDbContext context) : ISegmentService
             {
                 Id = s.Id,
                 Name = s.Name,
-                Description = s.Discription,
-                UserIds = s.Users.Select(u => u.Id).ToList()
+                Description = s.Description,
             })
             .ToListAsync();
     }
@@ -121,7 +121,7 @@ public class SegmentService(AppDbContext context) : ISegmentService
             return false;
 
         segment.Name = updateSegmentDto.Name;
-        segment.Discription = updateSegmentDto.Description;
+        segment.Description = updateSegmentDto.Description;
 
         await context.SaveChangesAsync();
         return true;
@@ -130,13 +130,13 @@ public class SegmentService(AppDbContext context) : ISegmentService
     public async Task<bool> DeleteSomeUsersFromSegment(Guid segmentId, List<Guid> userIds)
     {
         var segment = await context.Segments
-            .Include(s => s.Users)
+            .Include(s => s.VkUsers)
             .FirstOrDefaultAsync(s => s.Id == segmentId);
 
         if (segment == null) 
             return false;
 
-        segment.Users.RemoveAll(u => userIds.Contains(u.Id));
+        segment.VkUsers.RemoveAll(u => userIds.Contains(u.Id));
         await context.SaveChangesAsync();
         return true;
     }

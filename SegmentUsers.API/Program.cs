@@ -30,7 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         b => b.MigrationsAssembly("SegmentUsers.Infrastructure")));
 
 builder.Services.AddScoped<ISegmentService, SegmentService>();
-builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IVkUserService,VkUserService>();
 
 var bucketAccessKey = Environment.GetEnvironmentVariable("YC_STORAGE_ACCESS_KEY");
 var bucketSecretKey = Environment.GetEnvironmentVariable("YC_STORAGE_SECRET_KEY");
@@ -45,7 +45,7 @@ builder.Services.AddSingleton<IAmazonS3>(new AmazonS3Client(bucketAccessKey, buc
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddIdentityApiEndpoints<User>()
+builder.Services.AddIdentityApiEndpoints<Admin>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddSwaggerGen(options =>
@@ -71,7 +71,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(x => x.WithOrigins("http://ui:5002").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
-app.MapIdentityApi<User>();
+app.MapIdentityApi<VkUser>();
 
 app.UseAuthentication();
 app.UseAuthorization();

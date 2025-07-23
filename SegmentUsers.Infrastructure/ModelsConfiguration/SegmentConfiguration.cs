@@ -9,7 +9,7 @@ public class SegmentConfiguration : IEntityTypeConfiguration<Segment>
     public void Configure(EntityTypeBuilder<Segment> builder)
     {
         builder.HasKey(s => s.Id);
-        builder.HasMany(s => s.Users)
+        builder.HasMany(s => s.VkUsers)
             .WithMany(u => u.Segments);
     }
 }

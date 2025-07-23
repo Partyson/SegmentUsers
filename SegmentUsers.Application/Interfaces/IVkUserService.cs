@@ -2,10 +2,10 @@
 
 namespace SegmentUsers.Application.Interfaces;
 
-public interface IUserService
+public interface IVkUserService
 {
     public Task<bool> AddToSegments(Guid userId, List<Guid> segmentIds);
-    public Task<List<SegmentResponseDto>> GetUserSegments(Guid userId);
-    public Task<List<SegmentResponseDto>> GetAllUserSegments();
+    public Task<UserResponseDto?> GetVkUser(Guid userId);
+    public Task<List<UserResponseDto>> GetVkUsers();
     public Task<bool> DeleteFromSegments(Guid userId, List<Guid> segmentIds);
 }
