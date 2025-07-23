@@ -1,0 +1,35 @@
+﻿@page
+@model SegmentUsers.UI.Pages.AddUsersToSegmentModel
+@{
+ViewData["Title"] = "Назначить пользователей в сегмент";
+}
+
+<h2>Назначить пользователей в сегмент: @Model.SegmentName</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="SegmentId" />
+
+    @if (Model.AvailableUsers?.Any() == true)
+    {
+    <ul class="list-group mb-3">
+        @for (int i = 0; i < Model.AvailableUsers.Count; i++)
+        {
+        <li class="list-group-item">
+            <input type="checkbox" asp-for="AvailableUsers[i].IsSelected" class="form-check-input me-2" />
+            <label class="form-check-label">
+                @Model.AvailableUsers[i].Name @Model.AvailableUsers[i].LastName — @Model.AvailableUsers[i].Email
+            </label>
+            <input type="hidden" asp-for="AvailableUsers[i].Id" />
+        </li>
+        }
+    </ul>
+
+    <button type="submit" class="btn btn-primary">Назначить выбранных</button>
+    <a asp-page="/Segment" asp-route-segmentId="@Model.SegmentId" class="btn btn-secondary ms-2">Отмена</a>
+    }
+    else
+    {
+    <p class="text-muted">Нет пользователей, которых можно назначить.</p>
+    <a asp-page="/Segment" asp-route-segmentId="@Model.SegmentId" class="btn btn-secondary">← Назад</a>
+    }
+</form>

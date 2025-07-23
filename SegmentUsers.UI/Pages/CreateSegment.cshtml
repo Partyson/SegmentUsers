@@ -1,0 +1,51 @@
+﻿@page
+@model SegmentUsers.UI.Pages.CreateSegmentModel
+@{
+    ViewData["Title"] = "Создать сегмент";
+}
+
+<h2>Создать сегмент</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label">Название сегмента</label>
+        <input asp-for="Input.Name" class="form-control" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Description" class="form-label">Описание (необязательно)</label>
+        <textarea asp-for="Input.Description" class="form-control"></textarea>
+        <span asp-validation-for="Input.Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <button type="button" class="btn btn-outline-primary" onclick="toggleUserList()">Выбрать пользователей</button>
+    </div>
+
+    <div id="userList" style="display:none; max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+        @foreach (var user in Model.AvailableUsers)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" 
+                       id="user_@user.Id" 
+                       name="Input.VkUserIds" 
+                       value="@user.Id"
+                       @(Model.Input.VkUserIds?.Contains(user.Id) == true ? "checked" : "") />
+                <label class="form-check-label" for="user_@user.Id">@user.Name @user.LastName (@user.Email)</label>
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать</button>
+    <a asp-page="/Index" class="btn btn-secondary ms-2">Отмена</a>
+</form>
+
+@section Scripts {
+    <script>
+        function toggleUserList() {
+            const list = document.getElementById('userList');
+            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SegmentUsers.Application.DTOs;
 using SegmentUsers.Application.Interfaces;
 
 namespace SegmentUsers.API.Controllers;
@@ -9,6 +10,13 @@ namespace SegmentUsers.API.Controllers;
 [Route("api/users")]
 public class VkUserController(IVkUserService vkUserService) : ControllerBase
 {
+    [HttpPost]
+    public async Task<IActionResult> CreateVkUser(CreateVkUserDto createVkUserDto)
+    {
+        var createdVkUserId = await vkUserService.CreateVkUser(createVkUserDto);
+        return createdVkUserId != Guid.Empty ? Ok(createdVkUserId) : BadRequest();
+    }
+    
     /// <summary>
     /// Добавить пользователя в указанные сегменты.
     /// </summary>

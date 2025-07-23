@@ -1,12 +1,36 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SegmentUsers.Application.DTOs;
 using SegmentUsers.Application.Interfaces;
+using SegmentUsers.Domain.Entities;
 using SegmentUsers.Infrastructure.Data;
 
 namespace SegmentUsers.Application.Services;
 
 public class VkUserService(AppDbContext context) : IVkUserService
 {
+    public async Task<Guid> CreateVkUser(CreateVkUserDto createVkUserDto)
+    {
+        var segments = context.Segments
+            .Where(x => createVkUserDto.SegmentIds != null && createVkUserDto.SegmentIds.Contains(x.Id))
+            .ToList();
+
+        if (createVkUserDto.SegmentIds != null && segments.Count != createVkUserDto.SegmentIds.Count)
+            return Guid.Empty;
+        
+        var vkUser = new VkUser
+        {
+            Id = Guid.NewGuid(),
+            Name = createVkUserDto.Name,
+            LastName = createVkUserDto.LastName,
+            Email = createVkUserDto.Email,
+            Segments = segments
+        };
+        
+        var vkUserEntityEntry = await context.VkUsers.AddAsync(vkUser);
+        await context.SaveChangesAsync();
+        return vkUserEntityEntry.Entity.Id;
+    }
+
     public async Task<bool> AddToSegments(Guid vkUserId, List<Guid> segmentIds)
     {
         var vkUser = await context.VkUsers

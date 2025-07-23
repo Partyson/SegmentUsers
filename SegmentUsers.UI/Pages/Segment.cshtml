@@ -1,0 +1,77 @@
+﻿@page "{segmentId:guid}"
+@model SegmentUsers.UI.Pages.SegmentModel
+@{
+ViewData["Title"] = "Сегмент";
+}
+
+<h2>@Model.Segment?.Name</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.Segment?.Description))
+{
+<p>@Model.Segment.Description</p>
+}
+else
+{
+<p class="text-muted">Описание отсутствует.</p>
+}
+
+<div class="mb-3">
+    <button class="btn btn-outline-primary me-2" type="button" onclick="togglePercentInput()">Добавить случайный процент пользователей</button>
+    <a class="btn btn-outline-success" asp-page="/AddUsersToSegment" asp-route-segmentId="@Model.Segment?.Id">Назначить вручную</a>
+</div>
+
+<form method="post" asp-page-handler="AssignPercent" id="percentForm" style="display:none;" class="mb-3">
+    <div class="input-group" style="max-width: 300px;">
+        <input asp-for="PercentToAssign" type="number" class="form-control" min="1" max="100" placeholder="Процент (1-100)" required />
+        <button class="btn btn-primary" type="submit">Подтвердить</button>
+    </div>
+    <small class="text-muted">Будет случайным образом назначено N% пользователей.</small>
+</form>
+
+@if (ViewData.ModelState.ErrorCount > 0)
+{
+<div class="alert alert-danger mt-2">
+    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+    {
+    <div>@error.ErrorMessage</div>
+    }
+</div>
+}
+
+@if (TempData["AssignSuccess"] != null)
+{
+<div class="alert alert-success mt-2">
+    @TempData["AssignSuccess"]
+</div>
+}
+
+<hr />
+
+<h4>Назначенные пользователи</h4>
+
+@if (Model.Segment?.Users is { Count: > 0 })
+{
+<ul class="list-group">
+    @foreach (var user in Model.Segment.Users)
+    {
+    <li class="list-group-item">
+        <strong>@user.Name @user.LastName</strong> — @user.Email
+    </li>
+    }
+</ul>
+}
+else
+{
+<p class="text-muted">Нет назначенных пользователей.</p>
+}
+
+<a asp-page="/Index" class="btn btn-secondary mt-3">← Назад</a>
+
+@section Scripts {
+<script>
+    function togglePercentInput() {
+        const form = document.getElementById("percentForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+</script>
+}

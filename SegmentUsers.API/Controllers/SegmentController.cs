@@ -19,9 +19,9 @@ public class SegmentController(ISegmentService segmentService) : ControllerBase
     public async Task<IActionResult> CreateSegment([FromBody] CreateSegmentDto createSegmentDto)
     {
         var createdSegmentId = await segmentService.CreateSegment(createSegmentDto);
-        if (createdSegmentId == Guid.Empty)
-            return BadRequest("Invalid segment");
-        return Ok(createdSegmentId);
+        return createdSegmentId == Guid.Empty 
+            ? BadRequest("Invalid segment") 
+            : Ok(createdSegmentId);
     }
 
     /// <summary>

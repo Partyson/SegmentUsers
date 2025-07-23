@@ -1,0 +1,55 @@
+﻿@page
+@model SegmentUsers.UI.Pages.CreateUserModel
+@{
+ViewData["Title"] = "Создать пользователя";
+}
+
+<h2>Создать пользователя</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label">Имя</label>
+        <input asp-for="Input.Name" class="form-control" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.LastName" class="form-label">Фамилия</label>
+        <input asp-for="Input.LastName" class="form-control" />
+        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label">Email</label>
+        <input asp-for="Input.Email" class="form-control" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <button type="button" class="btn btn-outline-primary" onclick="toggleSegmentList()">Выбрать сегменты</button>
+    </div>
+
+    <div id="segmentList" style="display:none; max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+        @foreach (var segment in Model.AvailableSegments)
+        {
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   id="segment_@segment.Id"
+                   name="Input.SegmentIds"
+                   value="@segment.Id"
+                   @(Model.Input.SegmentIds?.Contains(segment.Id) == true ? "checked" : "") />
+            <label class="form-check-label" for="segment_@segment.Id">@segment.Name</label>
+        </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать</button>
+    <a asp-page="/Index" class="btn btn-secondary ms-2">Отмена</a>
+</form>
+
+@section Scripts {
+<script>
+    function toggleSegmentList() {
+        const list = document.getElementById('segmentList');
+        list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+}
