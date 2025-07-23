@@ -7,40 +7,40 @@ namespace SegmentUsers.Application.Services;
 
 public class VkUserService(AppDbContext context) : IVkUserService
 {
-    public async Task<bool> AddToSegments(Guid userId, List<Guid> segmentIds)
+    public async Task<bool> AddToSegments(Guid vkUserId, List<Guid> segmentIds)
     {
-        var user = await context.VkUsers
+        var vkUser = await context.VkUsers
             .Include(u => u.Segments)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == vkUserId);
 
-        if (user == null) 
+        if (vkUser == null) 
             return false;
 
         var segments = await context.Segments
-            .Where(s => segmentIds.Contains(s.Id) && user.Segments.All(segment => segment.Id != s.Id))
+            .Where(s => segmentIds.Contains(s.Id) && vkUser.Segments.All(segment => segment.Id != s.Id))
             .ToListAsync();
         
-        user.Segments.AddRange(segments);
+        vkUser.Segments.AddRange(segments);
         await context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<UserResponseDto?> GetVkUser(Guid userId)
+    public async Task<VkUserResponseDto?> GetVkUser(Guid vkUserId)
     {
-        var user = await context.VkUsers
+        var vkUser = await context.VkUsers
             .Include(u => u.Segments)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == vkUserId);
 
-        if (user == null) 
+        if (vkUser == null) 
             return null;
 
-        return new UserResponseDto
+        return new VkUserResponseDto
         {
-            Id = user.Id,
-            Email = user.Email,
-            LastName = user.LastName,
-            Name = user.Name,
-            Segments = user.Segments.Select(s => new SegmentItemDto
+            Id = vkUser.Id,
+            Email = vkUser.Email,
+            LastName = vkUser.LastName,
+            Name = vkUser.Name,
+            Segments = vkUser.Segments.Select(s => new SegmentItemDto
             {
                 Id = s.Id,
                 Description = s.Description,
@@ -49,10 +49,10 @@ public class VkUserService(AppDbContext context) : IVkUserService
         };
     }
 
-    public async Task<List<UserResponseDto>> GetVkUsers()
+    public async Task<List<VkUserResponseDto>> GetVkUsers()
     {
-        var users = await context.VkUsers
-            .Select(u => new UserResponseDto
+        var vkUsers = await context.VkUsers
+            .Select(u => new VkUserResponseDto
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -66,19 +66,19 @@ public class VkUserService(AppDbContext context) : IVkUserService
                 }).ToList()
             })
             .ToListAsync();
-        return users;
+        return vkUsers;
     }
 
-    public async Task<bool> DeleteFromSegments(Guid userId, List<Guid> segmentIds)
+    public async Task<bool> DeleteFromSegments(Guid vkUserId, List<Guid> segmentIds)
     {
-        var user = await context.VkUsers
+        var vkUser = await context.VkUsers
             .Include(u => u.Segments)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+            .FirstOrDefaultAsync(u => u.Id == vkUserId);
 
-        if (user == null)
+        if (vkUser == null)
             return false;
 
-        user.Segments.RemoveAll(s => segmentIds.Contains(s.Id));
+        vkUser.Segments.RemoveAll(s => segmentIds.Contains(s.Id));
         await context.SaveChangesAsync();
         return true;
     }

@@ -41,12 +41,12 @@ public class SegmentController(ISegmentService segmentService) : ControllerBase
     /// Добавляет конкретных пользователей в сегмент.
     /// </summary>
     /// <param name="segmentId">Идентификатор сегмента.</param>
-    /// <param name="userIds">Список идентификаторов пользователей, которых нужно добавить.</param>
+    /// <param name="vkUserIds">Список идентификаторов пользователей, которых нужно добавить.</param>
     /// <returns>200 OK при успехе или 400 BadRequest при ошибке.</returns>
     [HttpPost("users/{segmentId:guid}")]
-    public async Task<IActionResult> AddSomeVkUsersForSegment([FromRoute] Guid segmentId, [FromBody] List<Guid> userIds)
+    public async Task<IActionResult> AddSomeVkUsersForSegment([FromRoute] Guid segmentId, [FromBody] List<Guid> vkUserIds)
     {
-        var result = await segmentService.AddSomeUsersForSegment(segmentId, userIds);
+        var result = await segmentService.AddSomeUsersForSegment(segmentId, vkUserIds);
         return result ? Ok(result) : BadRequest();
     }
 
@@ -90,12 +90,12 @@ public class SegmentController(ISegmentService segmentService) : ControllerBase
     /// Удаляет определенных пользователей из сегмента.
     /// </summary>
     /// <param name="segmentId">Идентификатор сегмента.</param>
-    /// <param name="userIds">Список идентификаторов пользователей для удаления из сегмента.</param>
+    /// <param name="vkUserIds">Список идентификаторов пользователей для удаления из сегмента.</param>
     /// <returns>200 OK при успехе или 400 BadRequest при ошибке.</returns>
     [HttpDelete("users/{segmentId:guid}")]
-    public async Task<IActionResult> DeleteSomeUsersFromSegment([FromRoute] Guid segmentId, [FromBody] List<Guid> userIds)
+    public async Task<IActionResult> DeleteSomeUsersFromSegment([FromRoute] Guid segmentId, [FromBody] List<Guid> vkUserIds)
     {
-        var result = await segmentService.DeleteSomeUsersFromSegment(segmentId, userIds);
+        var result = await segmentService.DeleteSomeUsersFromSegment(segmentId, vkUserIds);
         return result ? Ok(result) : BadRequest();
     }
 
