@@ -6,5 +6,5 @@ public class UserResponseDto
     public string Name { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string LastName { get; set; } = null!;
-    public List<SegmentResponseDto> Segments { get; set; }
+    public List<SegmentItemDto> Segments { get; set; }
 }

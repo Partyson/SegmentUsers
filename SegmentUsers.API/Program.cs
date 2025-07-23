@@ -7,6 +7,7 @@ using SegmentUsers.Application.Interfaces;
 using SegmentUsers.Application.Services;
 using SegmentUsers.Domain.Entities;
 using SegmentUsers.Infrastructure.Data;
+using SegmentUsers.Infrastructure.Helpers;
 using Swashbuckle.AspNetCore.Filters;
 
 Env.Load();
@@ -50,6 +51,9 @@ builder.Services.AddIdentityApiEndpoints<Admin>()
 
 builder.Services.AddSwaggerGen(options =>
 {
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -65,13 +69,18 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await DataSeeder.SeedVkUsersAsync(dbContext);
+    }
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseCors(x => x.WithOrigins("http://ui:5002").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
-app.MapIdentityApi<VkUser>();
+app.MapIdentityApi<Admin>();
 
 app.UseAuthentication();
 app.UseAuthorization();

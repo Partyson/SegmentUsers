@@ -40,7 +40,7 @@ public class VkUserService(AppDbContext context) : IVkUserService
             Email = user.Email,
             LastName = user.LastName,
             Name = user.Name,
-            Segments = user.Segments.Select(s => new SegmentResponseDto
+            Segments = user.Segments.Select(s => new SegmentItemDto
             {
                 Id = s.Id,
                 Description = s.Description,
@@ -58,7 +58,7 @@ public class VkUserService(AppDbContext context) : IVkUserService
                 Email = u.Email,
                 LastName = u.LastName,
                 Name = u.Name,
-                Segments = u.Segments.Select(s => new SegmentResponseDto
+                Segments = u.Segments.Select(s => new SegmentItemDto
                 {
                     Id = s.Id,
                     Description = s.Description,

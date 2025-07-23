@@ -11,10 +11,10 @@ public class SegmentService(AppDbContext context) : ISegmentService
     public async Task<Guid> CreateSegment(CreateSegmentDto createSegmentDto)
     {
         var users = context.VkUsers
-            .Where(x => createSegmentDto.VkUserIds.Contains(x.Id))
+            .Where(x => createSegmentDto.VkUserIds != null && createSegmentDto.VkUserIds.Contains(x.Id))
             .ToList();
 
-        if (users.Count != createSegmentDto.VkUserIds.Count)
+        if (createSegmentDto.VkUserIds != null && users.Count != createSegmentDto.VkUserIds.Count)
             return Guid.Empty;
         
         var segment = new Segment
@@ -42,9 +42,11 @@ public class SegmentService(AppDbContext context) : ISegmentService
 
         if (segment == null)
             return false;
+        
+        var existingUserIds = segment.VkUsers.Select(u => u.Id).ToHashSet();
 
         var usersNotInSegment = await context.VkUsers
-            .Where(u => segment.VkUsers.All(su => su.Id != u.Id))
+            .Where(u => !existingUserIds.Contains(u.Id))
             .ToListAsync();
 
         if (usersNotInSegment.Count == 0)
@@ -98,18 +100,31 @@ public class SegmentService(AppDbContext context) : ISegmentService
             Id = segment.Id,
             Name = segment.Name,
             Description = segment.Description,
+            Users = segment.VkUsers.Select(x => new UserItemDto
+            {
+                Id = x.Id,
+                Email = x.Email,
+                LastName = x.LastName,
+                Name = x.Name,
+            }).ToList()
         };
     }
 
     public async Task<List<SegmentResponseDto>> GetSegments()
     {
         return await context.Segments
-            //.Include(s => s.Users)
             .Select(s => new SegmentResponseDto
             {
                 Id = s.Id,
                 Name = s.Name,
                 Description = s.Description,
+                Users = s.VkUsers.Select(x => new UserItemDto
+                {
+                    Id = x.Id,
+                    Email = x.Email,
+                    LastName = x.LastName,
+                    Name = x.Name,
+                }).ToList()
             })
             .ToListAsync();
     }
