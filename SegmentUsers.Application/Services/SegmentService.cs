@@ -10,13 +10,17 @@ public class SegmentService(AppDbContext context) : ISegmentService
 {
     public async Task<Guid> CreateSegment(CreateSegmentDto createSegmentDto)
     {
+        var exists = await context.Segments.AnyAsync(s => s.Name == createSegmentDto.Name);
+        if (exists)
+            return Guid.Empty; 
+
         var vkUsers = await context.VkUsers
             .Where(x => createSegmentDto.VkUserIds != null && createSegmentDto.VkUserIds.Contains(x.Id))
             .ToListAsync();
 
         if (createSegmentDto.VkUserIds != null && vkUsers.Count != createSegmentDto.VkUserIds.Count)
             return Guid.Empty;
-        
+
         var segment = new Segment
         {
             Id = Guid.NewGuid(),
@@ -24,7 +28,7 @@ public class SegmentService(AppDbContext context) : ISegmentService
             Description = createSegmentDto.Description,
             VkUsers = vkUsers
         };
-        
+
         var segmentEntityEntry = await context.Segments.AddAsync(segment);
         await context.SaveChangesAsync();
         return segmentEntityEntry.Entity.Id;

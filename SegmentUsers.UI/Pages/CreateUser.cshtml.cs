@@ -24,6 +24,9 @@ public class CreateUserModel : PageModel
 
     public List<SegmentResponseDto> AvailableSegments { get; set; } = new();
 
+    // Свойство для отображения ошибки от API в виде JSON
+    public string ApiErrorMessage { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync()
     {
         var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
@@ -47,7 +50,7 @@ public class CreateUserModel : PageModel
     {
         if (!ModelState.IsValid)
         {
-            await OnGetAsync(); // чтобы AvailableSegments не был пустым при ошибке валидации
+            await OnGetAsync();
             return Page();
         }
 
@@ -57,10 +60,14 @@ public class CreateUserModel : PageModel
 
         var response = await client.PostAsJsonAsync("/api/users", Input);
         if (response.IsSuccessStatusCode)
+        {
+            TempData["SuccessMessage"] = "Пользователь успешно создан.";
             return RedirectToPage("/Index");
+        }
 
-        ModelState.AddModelError(string.Empty, "Ошибка при создании пользователя.");
-        await OnGetAsync(); // повторно загрузим список сегментов
+        ApiErrorMessage = await response.Content.ReadAsStringAsync();
+
+        await OnGetAsync();
         return Page();
     }
 }

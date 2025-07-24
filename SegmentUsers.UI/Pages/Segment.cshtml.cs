@@ -54,16 +54,32 @@ public class SegmentModel : PageModel
         if (client == null)
             return RedirectToPage("/Login");
 
-        // Отправляем просто число процентов в теле запроса
         var response = await client.PostAsJsonAsync($"/api/segments/random-users/{SegmentId}", PercentToAssign);
         if (!response.IsSuccessStatusCode)
         {
             ModelState.AddModelError(string.Empty, "Ошибка при назначении пользователей.");
-            // Обновим данные сегмента, чтобы заново отобразить страницу с ошибкой
             await OnGetAsync(SegmentId);
             return Page();
         }
 
+        TempData["AssignSuccess"] = "Пользователи успешно назначены.";
         return RedirectToPage(new { segmentId = SegmentId });
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync()
+    {
+        var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
+        if (client == null)
+            return RedirectToPage("/Login");
+
+        var response = await client.DeleteAsync($"/api/segments/{SegmentId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            ModelState.AddModelError(string.Empty, "Ошибка при удалении сегмента.");
+            await OnGetAsync(SegmentId); // Чтобы показать текущие данные и ошибку
+            return Page();
+        }
+
+        return RedirectToPage("/Index");
     }
 }

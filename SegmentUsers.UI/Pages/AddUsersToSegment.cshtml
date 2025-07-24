@@ -6,6 +6,13 @@ ViewData["Title"] = "Назначить пользователей в сегме
 
 <h2>Назначить пользователей в сегмент: @Model.SegmentName</h2>
 
+@if (TempData["AssignSuccess"] != null)
+{
+<div class="alert alert-success mt-2">
+    @TempData["AssignSuccess"]
+</div>
+}
+
 <form method="post">
     <input type="hidden" asp-for="SegmentId" />
 
@@ -36,7 +43,6 @@ ViewData["Title"] = "Назначить пользователей в сегме
             {
             <tr>
                 <td>
-                    <!-- Используем name="SelectedUserIds" и value = Id -->
                     <input type="checkbox" name="SelectedUserIds" value="@Model.AvailableUsers[i].Id" class="form-check-input" />
                 </td>
                 <td>@Model.AvailableUsers[i].Name @Model.AvailableUsers[i].LastName</td>

@@ -43,11 +43,13 @@ public class CreateSegmentModel : PageModel
         return Page();
     }
 
+    public string ApiErrorMessage { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
-            await OnGetAsync(); // чтобы AvailableUsers не был пустым при ошибке валидации
+            await OnGetAsync();
             return Page();
         }
 
@@ -57,10 +59,16 @@ public class CreateSegmentModel : PageModel
 
         var response = await client.PostAsJsonAsync("/api/segments", Input);
         if (response.IsSuccessStatusCode)
+        {
+            TempData["SuccessMessage"] = "Сегмент успешно создан.";
             return RedirectToPage("/Index");
+        }
 
-        ModelState.AddModelError(string.Empty, "Ошибка при создании сегмента.");
-        await OnGetAsync(); // повторно загрузим список пользователей
+        var errorContent = await response.Content.ReadAsStringAsync();
+        ApiErrorMessage = errorContent;
+
+        await OnGetAsync();
         return Page();
     }
+
 }

@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using SegmentUsers.UI.DTOs;
@@ -26,10 +24,8 @@ namespace SegmentUsers.UI.Pages
         [BindProperty]
         public string SegmentName { get; set; } = string.Empty;
 
-        // Список доступных пользователей для отображения
         public List<VkUserItemDto> AvailableUsers { get; set; } = new();
 
-        // Отдельный список выбранных пользователем Id
         [BindProperty]
         public List<Guid> SelectedUserIds { get; set; } = new();
 
@@ -80,7 +76,8 @@ namespace SegmentUsers.UI.Pages
                 return Page();
             }
 
-            // После успешного запроса обновим список
+            TempData["AssignSuccess"] = "Пользователи успешно назначены.";
+
             await LoadAvailableUsersAsync();
             return Page();
         }

@@ -6,6 +6,13 @@ ViewData["Title"] = "Создать пользователя";
 
 <h2>Создать пользователя</h2>
 
+@if (!string.IsNullOrEmpty(Model.ApiErrorMessage))
+{
+<div class="alert alert-danger" role="alert">
+    @Model.ApiErrorMessage
+</div>
+}
+
 <form method="post">
     <div class="mb-3">
         <label asp-for="Input.Name" class="form-label">Имя</label>

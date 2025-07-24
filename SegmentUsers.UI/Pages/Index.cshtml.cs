@@ -19,7 +19,11 @@ public class IndexModel : PageModel
         apiSettings = options.Value;
     }
 
+    [BindProperty(SupportsGet = true)]
+    public string ViewMode { get; set; } = "Users"; // По умолчанию показываем пользователей
+
     public List<VkUserResponse>? Users { get; set; }
+    public List<SegmentResponseDto>? Segments { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -27,15 +31,30 @@ public class IndexModel : PageModel
         if (client is null)
             return RedirectToPage("/Login");
 
-        var response = await client.GetAsync("/api/users");
-        if (!response.IsSuccessStatusCode)
-            return RedirectToPage("/Login");
-
-        var content = await response.Content.ReadAsStringAsync();
-        Users = JsonSerializer.Deserialize<List<VkUserResponse>>(content, new JsonSerializerOptions
+        if (ViewMode == "Users")
         {
-            PropertyNameCaseInsensitive = true
-        });
+            var response = await client.GetAsync("/api/users");
+            if (!response.IsSuccessStatusCode)
+                return RedirectToPage("/Login");
+
+            var content = await response.Content.ReadAsStringAsync();
+            Users = JsonSerializer.Deserialize<List<VkUserResponse>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        else if (ViewMode == "Segments")
+        {
+            var response = await client.GetAsync("/api/segments");
+            if (!response.IsSuccessStatusCode)
+                return RedirectToPage("/Login");
+
+            var content = await response.Content.ReadAsStringAsync();
+            Segments = JsonSerializer.Deserialize<List<SegmentResponseDto>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
 
         return Page();
     }

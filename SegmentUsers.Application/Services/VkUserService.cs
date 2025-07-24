@@ -10,13 +10,17 @@ public class VkUserService(AppDbContext context) : IVkUserService
 {
     public async Task<Guid> CreateVkUser(CreateVkUserDto createVkUserDto)
     {
+        var exists = await context.VkUsers.AnyAsync(u => u.Email == createVkUserDto.Email);
+        if (exists)
+            return Guid.Empty;
+
         var segments = await context.Segments
             .Where(x => createVkUserDto.SegmentIds != null && createVkUserDto.SegmentIds.Contains(x.Id))
             .ToListAsync();
 
         if (createVkUserDto.SegmentIds != null && segments.Count != createVkUserDto.SegmentIds.Count)
             return Guid.Empty;
-        
+
         var vkUser = new VkUser
         {
             Id = Guid.NewGuid(),
@@ -25,7 +29,7 @@ public class VkUserService(AppDbContext context) : IVkUserService
             Email = createVkUserDto.Email,
             Segments = segments
         };
-        
+
         var vkUserEntityEntry = await context.VkUsers.AddAsync(vkUser);
         await context.SaveChangesAsync();
         return vkUserEntityEntry.Entity.Id;

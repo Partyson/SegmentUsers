@@ -19,8 +19,12 @@ else
     <a class="btn btn-outline-secondary" asp-page="/Index">← На главную</a>
     <button class="btn btn-outline-primary" type="button" onclick="togglePercentInput()">Добавить случайный процент пользователей</button>
     <a class="btn btn-outline-success" asp-page="/AddUsersToSegment" asp-route-segmentId="@Model.Segment?.Id">Назначить вручную</a>
-</div>
 
+    <!-- Форма удаления сегмента -->
+    <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Вы уверены, что хотите удалить сегмент? Это действие необратимо.');" style="display:inline;">
+        <button type="submit" class="btn btn-outline-danger">Удалить сегмент</button>
+    </form>
+</div>
 
 <form method="post" asp-page-handler="AssignPercent" id="percentForm" style="display:none;" class="mb-3">
     <div class="input-group" style="max-width: 300px;">

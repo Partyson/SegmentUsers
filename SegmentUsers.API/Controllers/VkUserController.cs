@@ -14,7 +14,7 @@ public class VkUserController(IVkUserService vkUserService) : ControllerBase
     public async Task<IActionResult> CreateVkUser(CreateVkUserDto createVkUserDto)
     {
         var createdVkUserId = await vkUserService.CreateVkUser(createVkUserDto);
-        return createdVkUserId != Guid.Empty ? Ok(createdVkUserId) : BadRequest();
+        return createdVkUserId != Guid.Empty ? Ok(createdVkUserId) : BadRequest("Invalid User");
     }
     
     /// <summary>
