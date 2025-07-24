@@ -10,9 +10,9 @@ public class SegmentService(AppDbContext context) : ISegmentService
 {
     public async Task<Guid> CreateSegment(CreateSegmentDto createSegmentDto)
     {
-        var vkUsers = context.VkUsers
+        var vkUsers = await context.VkUsers
             .Where(x => createSegmentDto.VkUserIds != null && createSegmentDto.VkUserIds.Contains(x.Id))
-            .ToList();
+            .ToListAsync();
 
         if (createSegmentDto.VkUserIds != null && vkUsers.Count != createSegmentDto.VkUserIds.Count)
             return Guid.Empty;
@@ -77,8 +77,10 @@ public class SegmentService(AppDbContext context) : ISegmentService
         if (segment == null) 
             return false;
 
+        var vkUserIdsInSegment = segment.VkUsers.Select(u => u.Id).ToHashSet();
+
         var vkUsers = await context.VkUsers
-            .Where(u => vkUserIds.Contains(u.Id) && segment.VkUsers.All(user => user.Id != u.Id))
+            .Where(u => vkUserIds.Contains(u.Id) && !vkUserIdsInSegment.Contains(u.Id))
             .ToListAsync();
         
         segment.VkUsers.AddRange(vkUsers);

@@ -1,7 +1,7 @@
 ﻿@page
 @model SegmentUsers.UI.Pages.IndexModel
 @{
-    ViewData["Title"] = "Пользователи";
+ViewData["Title"] = "Пользователи";
 }
 
 <h1 class="mb-4">Пользователи и их сегменты</h1>
@@ -13,34 +13,79 @@
 
 @if (Model.Users?.Any() == true)
 {
-    foreach (var user in Model.Users)
-    {
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">@user.Name @user.LastName</h5>
-                <p class="card-text"><strong>Email:</strong> @user.Email</p>
+<div class="table-responsive">
+    <table class="table table-bordered align-middle" id="usersTable">
+        <thead class="table-light">
+        <tr>
+            <th>
+                Полное имя<br />
+                <input type="text" class="form-control form-control-sm" placeholder="Поиск..." onkeyup="filterTable(0, this.value)">
+            </th>
+            <th>
+                Email<br />
+                <input type="text" class="form-control form-control-sm" placeholder="Поиск..." onkeyup="filterTable(1, this.value)">
+            </th>
+            <th>
+                Сегменты<br />
+                <input type="text" class="form-control form-control-sm" placeholder="Поиск..." onkeyup="filterTable(2, this.value)">
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model.Users)
+        {
+        var fullName = $"{user.Name} {user.LastName}";
+        var segmentNames = user.Segments?.Any() == true
+        ? string.Join(", ", user.Segments.Select(s => s.Name))
+        : "Нет сегментов";
 
+        <tr>
+            <td>@fullName</td>
+            <td>@user.Email</td>
+            <td>
                 @if (user.Segments?.Any() == true)
                 {
-                    <p><strong>Сегменты:</strong></p>
-                    <ul class="list-group">
-                        @foreach (var segment in user.Segments)
-                        {
-                            <li class="list-group-item">
-                                <a asp-page="/Segment" asp-route-segmentId="@segment.Id">@segment.Name</a>
-                            </li>
-                        }
-                    </ul>
+                <ul class="mb-0">
+                    @foreach (var segment in user.Segments)
+                    {
+                    <li>
+                        <a asp-page="/Segment" asp-route-segmentId="@segment.Id">@segment.Name</a>
+                    </li>
+                    }
+                </ul>
                 }
                 else
                 {
-                    <p class="text-muted">Сегменты не назначены.</p>
+                <span class="text-muted">Нет сегментов</span>
                 }
-            </div>
-        </div>
-    }
+            </td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
 }
 else
 {
-    <p>Нет пользователей для отображения.</p>
+<p>Нет пользователей для отображения.</p>
+}
+
+@section Scripts {
+<script>
+    function filterTable(columnIndex, filterValue) {
+        const table = document.getElementById("usersTable");
+        const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        const value = filterValue.toLowerCase();
+
+        for (let i = 0; i < rows.length; i++) {
+            const cell = rows[i].getElementsByTagName("td")[columnIndex];
+            const text = cell.innerText.toLowerCase();
+            if (text.includes(value)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
 }

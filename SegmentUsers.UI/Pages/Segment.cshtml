@@ -15,10 +15,12 @@ else
 <p class="text-muted">Описание отсутствует.</p>
 }
 
-<div class="mb-3">
-    <button class="btn btn-outline-primary me-2" type="button" onclick="togglePercentInput()">Добавить случайный процент пользователей</button>
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" asp-page="/Index">← На главную</a>
+    <button class="btn btn-outline-primary" type="button" onclick="togglePercentInput()">Добавить случайный процент пользователей</button>
     <a class="btn btn-outline-success" asp-page="/AddUsersToSegment" asp-route-segmentId="@Model.Segment?.Id">Назначить вручную</a>
 </div>
+
 
 <form method="post" asp-page-handler="AssignPercent" id="percentForm" style="display:none;" class="mb-3">
     <div class="input-group" style="max-width: 300px;">

@@ -10,9 +10,9 @@ public class VkUserService(AppDbContext context) : IVkUserService
 {
     public async Task<Guid> CreateVkUser(CreateVkUserDto createVkUserDto)
     {
-        var segments = context.Segments
+        var segments = await context.Segments
             .Where(x => createVkUserDto.SegmentIds != null && createVkUserDto.SegmentIds.Contains(x.Id))
-            .ToList();
+            .ToListAsync();
 
         if (createVkUserDto.SegmentIds != null && segments.Count != createVkUserDto.SegmentIds.Count)
             return Guid.Empty;
@@ -39,9 +39,11 @@ public class VkUserService(AppDbContext context) : IVkUserService
 
         if (vkUser == null) 
             return false;
+        
+        var vkUserSegmentIds = vkUser.Segments.Select(s => s.Id).ToList();
 
         var segments = await context.Segments
-            .Where(s => segmentIds.Contains(s.Id) && vkUser.Segments.All(segment => segment.Id != s.Id))
+            .Where(s => segmentIds.Contains(s.Id) && !vkUserSegmentIds.Contains(s.Id))
             .ToListAsync();
         
         vkUser.Segments.AddRange(segments);

@@ -7,89 +7,100 @@ using SegmentUsers.UI.DTOs;
 using SegmentUsers.UI.Extensions;
 using SegmentUsers.UI.Helpers;
 
-namespace SegmentUsers.UI.Pages;
-
-public class AddUsersToSegmentModel : PageModel
+namespace SegmentUsers.UI.Pages
 {
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly ApiSettings apiSettings;
-
-    public AddUsersToSegmentModel(IHttpClientFactory httpClientFactory, IOptions<ApiSettings> options)
+    public class AddUsersToSegmentModel : PageModel
     {
-        this.httpClientFactory = httpClientFactory;
-        apiSettings = options.Value;
-    }
+        private readonly IHttpClientFactory httpClientFactory;
+        private readonly ApiSettings apiSettings;
 
-    [BindProperty(SupportsGet = true)]
-    public Guid SegmentId { get; set; }
+        public AddUsersToSegmentModel(IHttpClientFactory httpClientFactory, IOptions<ApiSettings> options)
+        {
+            this.httpClientFactory = httpClientFactory;
+            apiSettings = options.Value;
+        }
 
-    [BindProperty]
-    public string SegmentName { get; set; } = string.Empty;
+        [BindProperty(SupportsGet = true)]
+        public Guid SegmentId { get; set; }
 
-    [BindProperty]
-    public List<UserSelectionDto> AvailableUsers { get; set; } = new();
+        [BindProperty]
+        public string SegmentName { get; set; } = string.Empty;
 
-    public async Task<IActionResult> OnGetAsync()
-    {
-        var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
-        if (client == null)
-            return RedirectToPage("/Login");
+        // Список доступных пользователей для отображения
+        public List<VkUserItemDto> AvailableUsers { get; set; } = new();
 
-        var segment = await client.GetFromJsonAsync<SegmentResponseDto>($"/api/segments/{SegmentId}");
-        if (segment == null)
-            return NotFound();
+        // Отдельный список выбранных пользователем Id
+        [BindProperty]
+        public List<Guid> SelectedUserIds { get; set; } = new();
 
-        SegmentName = segment.Name;
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
+            if (client == null)
+                return RedirectToPage("/Login");
 
-        var allUsers = await client.GetFromJsonAsync<List<VkUserItemDto>>("/api/users");
-        if (allUsers == null)
-            return NotFound();
+            var segment = await client.GetFromJsonAsync<SegmentResponseDto>($"/api/segments/{SegmentId}");
+            if (segment == null)
+                return NotFound();
 
-        var assignedIds = segment.Users?.Select(u => u.Id).ToHashSet() ?? [];
+            SegmentName = segment.Name;
 
-        AvailableUsers = allUsers
-            .Where(u => !assignedIds.Contains(u.Id))
-            .Select(u => new UserSelectionDto
+            var allUsers = await client.GetFromJsonAsync<List<VkUserItemDto>>("/api/users");
+            if (allUsers == null)
+                return NotFound();
+
+            var assignedIds = segment.Users?.Select(u => u.Id).ToHashSet() ?? new HashSet<Guid>();
+
+            AvailableUsers = allUsers
+                .Where(u => !assignedIds.Contains(u.Id))
+                .ToList();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
+            if (client == null)
+                return RedirectToPage("/Login");
+
+            if (SelectedUserIds == null || !SelectedUserIds.Any())
             {
-                Id = u.Id,
-                Name = u.Name,
-                Email = u.Email,
-                LastName = u.LastName
-            })
-            .ToList();
+                ModelState.AddModelError(string.Empty, "Выберите хотя бы одного пользователя.");
+                await LoadAvailableUsersAsync();
+                return Page();
+            }
 
-        return Page();
-    }
+            var response = await client.PostAsJsonAsync($"/api/segments/users/{SegmentId}", SelectedUserIds);
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
-        if (client == null)
-            return RedirectToPage("/Login");
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Не удалось назначить пользователей.");
+                await LoadAvailableUsersAsync();
+                return Page();
+            }
 
-        var selectedIds = AvailableUsers
-            .Where(u => u.IsSelected)
-            .Select(u => u.Id)
-            .ToList();
-
-        if (!selectedIds.Any())
-        {
-            ModelState.AddModelError(string.Empty, "Выберите хотя бы одного пользователя.");
-            return await OnGetAsync();
+            // После успешного запроса обновим список
+            await LoadAvailableUsersAsync();
+            return Page();
         }
 
-        var response = await client.PostAsJsonAsync($"/api/segments/users/{SegmentId}", selectedIds);
-        if (!response.IsSuccessStatusCode)
+        private async Task LoadAvailableUsersAsync()
         {
-            ModelState.AddModelError(string.Empty, "Не удалось назначить пользователей.");
-            return await OnGetAsync();
+            var client = httpClientFactory.CreateAuthorizedHttpClient(HttpContext, apiSettings);
+            var segment = await client.GetFromJsonAsync<SegmentResponseDto>($"/api/segments/{SegmentId}");
+            if (segment == null) return;
+
+            SegmentName = segment.Name;
+
+            var allUsers = await client.GetFromJsonAsync<List<VkUserItemDto>>("/api/users");
+            if (allUsers == null) return;
+
+            var assignedIds = segment.Users?.Select(u => u.Id).ToHashSet() ?? new HashSet<Guid>();
+
+            AvailableUsers = allUsers
+                .Where(u => !assignedIds.Contains(u.Id))
+                .ToList();
         }
-
-        return RedirectToPage("/Segment", new { segmentId = SegmentId });
-    }
-
-    public class UserSelectionDto : VkUserItemDto
-    {
-        public bool IsSelected { get; set; }
     }
 }

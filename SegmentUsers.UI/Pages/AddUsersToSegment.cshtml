@@ -11,21 +11,41 @@ ViewData["Title"] = "Назначить пользователей в сегме
 
     @if (Model.AvailableUsers?.Any() == true)
     {
-    <ul class="list-group mb-3">
-        @for (int i = 0; i < Model.AvailableUsers.Count; i++)
-        {
-        <li class="list-group-item">
-            <input type="checkbox" asp-for="AvailableUsers[i].IsSelected" class="form-check-input me-2" />
-            <label class="form-check-label">
-                @Model.AvailableUsers[i].Name @Model.AvailableUsers[i].LastName — @Model.AvailableUsers[i].Email
-            </label>
-            <input type="hidden" asp-for="AvailableUsers[i].Id" />
-        </li>
-        }
-    </ul>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Назначить выбранных</button>
+        <a asp-page="/Segment" asp-route-segmentId="@Model.SegmentId" class="btn btn-secondary ms-2">Отмена</a>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Назначить выбранных</button>
-    <a asp-page="/Segment" asp-route-segmentId="@Model.SegmentId" class="btn btn-secondary ms-2">Отмена</a>
+    <div class="table-responsive mb-3">
+        <table class="table table-bordered table-striped" id="usersTable">
+            <thead>
+            <tr>
+                <th></th>
+                <th>
+                    <div>ФИО</div>
+                    <input type="text" class="form-control form-control-sm" placeholder="Поиск по ФИО" onkeyup="filterTable(1, this.value)" />
+                </th>
+                <th>
+                    <div>Email</div>
+                    <input type="text" class="form-control form-control-sm" placeholder="Поиск по Email" onkeyup="filterTable(2, this.value)" />
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (int i = 0; i < Model.AvailableUsers.Count; i++)
+            {
+            <tr>
+                <td>
+                    <!-- Используем name="SelectedUserIds" и value = Id -->
+                    <input type="checkbox" name="SelectedUserIds" value="@Model.AvailableUsers[i].Id" class="form-check-input" />
+                </td>
+                <td>@Model.AvailableUsers[i].Name @Model.AvailableUsers[i].LastName</td>
+                <td>@Model.AvailableUsers[i].Email</td>
+            </tr>
+            }
+            </tbody>
+        </table>
+    </div>
     }
     else
     {
@@ -33,3 +53,20 @@ ViewData["Title"] = "Назначить пользователей в сегме
     <a asp-page="/Segment" asp-route-segmentId="@Model.SegmentId" class="btn btn-secondary">← Назад</a>
     }
 </form>
+
+@section Scripts {
+<script>
+    function filterTable(colIndex, searchValue) {
+        const table = document.getElementById("usersTable");
+        const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        searchValue = searchValue.toLowerCase();
+
+        for (let row of rows) {
+            const cell = row.getElementsByTagName("td")[colIndex];
+            if (!cell) continue;
+            const text = cell.textContent || cell.innerText;
+            row.style.display = text.toLowerCase().includes(searchValue) ? "" : "none";
+        }
+    }
+</script>
+}

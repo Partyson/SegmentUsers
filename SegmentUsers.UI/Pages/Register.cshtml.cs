@@ -1,5 +1,7 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -23,6 +25,7 @@ public class RegisterModel : PageModel
     public RegisterInput Input { get; set; }
 
     public List<string> Errors { get; set; } = new();
+
     public class RegisterInput
     {
         public string Email { get; set; } = string.Empty;
@@ -41,33 +44,69 @@ public class RegisterModel : PageModel
         var client = httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(apiSettings.BaseUrl);
 
-        var response = await client.PostAsJsonAsync("/register", new
+        // 1. Регистрация
+        var registerResponse = await client.PostAsJsonAsync("/register", new
         {
             Email = Input.Email,
             Password = Input.Password
         });
 
-        if (response.IsSuccessStatusCode)
+        if (!registerResponse.IsSuccessStatusCode)
         {
-            return RedirectToPage("/Login");
-        }
-
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetailsResponse>();
-            if (problemDetails?.Errors != null)
+            if (registerResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                Errors = problemDetails.Errors
-                    .SelectMany(kvp => kvp.Value.Select(msg => $"{msg}"))
-                    .ToList();
+                var problemDetails = await registerResponse.Content.ReadFromJsonAsync<ValidationProblemDetailsResponse>();
+                if (problemDetails?.Errors != null)
+                {
+                    Errors = problemDetails.Errors
+                        .SelectMany(kvp => kvp.Value.Select(msg => msg))
+                        .ToList();
+                }
+                else
+                {
+                    Errors.Add("Ошибка валидации данных.");
+                }
             }
             else
-                Errors.Add("Ошибка валидации данных.");
+            {
+                Errors.Add("Ошибка регистрации.");
+            }
 
             return Page();
         }
 
-        Errors.Add("Ошибка регистрации.");
-        return Page();
+        // 2. Автоматический логин
+        var loginResponse = await client.PostAsJsonAsync("/login", new
+        {
+            Email = Input.Email,
+            Password = Input.Password
+        });
+
+        if (!loginResponse.IsSuccessStatusCode)
+        {
+            Errors.Add("Регистрация прошла успешно, но вход не выполнен.");
+            return RedirectToPage("/Login");
+        }
+
+        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+        if (loginResult != null && !string.IsNullOrEmpty(loginResult.AccessToken))
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, Input.Email),
+                new Claim("AccessToken", loginResult.AccessToken),
+                new Claim("RefreshToken", loginResult.RefreshToken)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+            return RedirectToPage("/Index");
+        }
+
+        Errors.Add("Регистрация прошла, но не удалось войти.");
+        return RedirectToPage("/Login");
     }
 }
